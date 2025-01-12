@@ -4,7 +4,8 @@ import os
 from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
-from pymongo import MongoClient
+from utils import get_mongo_client
+
 
 # Load environment variables from .env.local
 load_dotenv(".env.local")
@@ -18,7 +19,7 @@ if not MONGODB_URI:
 app = FastAPI()
 
 # Create a MongoDB client and specify the database/collection
-client = MongoClient(MONGODB_URI)
+client = get_mongo_client(MONGODB_URI)
 db = client["fmp"]
 collection = db["traded_list"]
 
