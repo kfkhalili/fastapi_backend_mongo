@@ -91,7 +91,8 @@ def create_item(item: Item):
 def get_company_profile(symbol: str) -> dict:
     doc = dict(mongo.get_profile(company_profiles_collection, symbol))
 
-    doc["_id"] = str(doc["_id"])
+    if("_id" in doc):
+        doc["_id"] = str(doc["_id"])
 
     return doc
 
