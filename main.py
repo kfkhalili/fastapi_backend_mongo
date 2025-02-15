@@ -39,7 +39,6 @@ client = get_mongo_client(MONGODB_URI)
 db = client["fmp"]
 
 collection = db["traded_list"]
-notes_collection = db["notes"]
 company_profiles_collection = db["company_profiles"]
 financial_statements_collection = db["financial_statements"]
 
@@ -103,7 +102,7 @@ def get_financials(
     statement_type: Optional[str] = None
 ) -> List:
     """
-    Fetch a company profile and matching financial statements, 
+    Fetch the company financial statements, 
     optionally filtered by statement type.
     
     Example usage:
