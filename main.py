@@ -100,9 +100,9 @@ def get_company_profile(symbol: str) -> dict:
 def get_financials(
     symbol: str,
     statement_type: Optional[str] = None
-) -> dict:
+) -> List:
     """
-    Fetch a company profile and matching financial statements, 
+    Fetch the company financial statements, 
     optionally filtered by statement type.
     
     Example usage:
@@ -110,9 +110,6 @@ def get_financials(
         GET /financials/AAPL?statement_type=income
         GET /financials/AAPL?statement_type=balance
     """
-    # Get the profile in MongoDB
-    profile_doc = mongo.get_profile(company_profiles_collection, symbol)
-
     if statement_type:
         # Fetch just the requested statement type
         statement_docs = mongo.get_statement(financial_statements_collection, symbol, statement_type)
@@ -124,14 +121,9 @@ def get_financials(
             statement_docs.extend(mongo.get_statement(financial_statements_collection, symbol, stype))
 
     # Convert _id field to string for fastAPI compatibility
-    if "_id" in profile_doc:
-        profile_doc["_id"] = str(profile_doc["_id"])
     for doc in statement_docs:
         if "_id" in doc:
             doc["_id"] = str(doc["_id"])
 
     # Return response
-    return {
-        "profile": profile_doc,
-        "statements": statement_docs
-    }
+    return statement_docs
