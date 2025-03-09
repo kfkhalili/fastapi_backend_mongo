@@ -3,9 +3,10 @@ import logging
 import fmpsdk
 
 from fastapi import HTTPException
+from pymongo.errors import PyMongoError
 from dotenv import load_dotenv
-from pymongo import UpdateOne
 from typing import Optional, List
+from utils import get_mongo_client
 
 load_dotenv(".env.local")
 
@@ -18,6 +19,45 @@ if not MONGODB_URI:
     raise ValueError("No MONGODB_URI found in environment variables!")
 if not FMP_API_KEY:
     raise ValueError("No FMP_API_KEY found in environment variables!")
+
+client = get_mongo_client(MONGODB_URI)
+db = client["fmp"]
+
+user_input_collection = db["user_inputs"]
+
+def push_user_input(user_input: dict) -> str:
+    """
+    Merges new user input into the existing document in the 'user_inputs' collection.
+    New fields will overwrite older ones if they already exist.
+    If no document exists, it inserts a new one.
+    Returns the document's ID as a string.
+    """
+    try:
+        existing_doc = get_user_input()
+        if existing_doc is not None:
+            # Merge the new fields into the existing document
+            user_input_collection.update_one(
+                {'_id': existing_doc['_id']},
+                {"$set": user_input}
+            )
+            return str(existing_doc['_id'])
+        else:
+            result = user_input_collection.insert_one(user_input)
+            return str(result.inserted_id)
+    except PyMongoError as error:
+        raise Exception(f"Error updating user input: {error}")
+
+def get_user_input() -> dict:
+    """
+    Retrieves the first user input from the 'user_inputs' collection.
+    Returns the document as a dictionary if it exists, or None if the collection is empty.
+    """
+    try:
+        # Fetch all documents from the collection
+        user_inputs = list(user_input_collection.find())
+        return user_inputs[0] if user_inputs else {}
+    except PyMongoError as error:
+        raise Exception(f"Error retrieving user input: {error}")  
 
 def query_mongo_profile(collection, symbol: str) -> Optional[dict]:
     return collection.find_one({"symbol": symbol})
