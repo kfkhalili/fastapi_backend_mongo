@@ -1,7 +1,7 @@
 # logging_config.py
 
 import logging
-from utils import get_pyproject_data
+from app.utils import get_pyproject_data
 
 def setup_logging() -> None:
     """Configure logging for the project"""

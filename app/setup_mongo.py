@@ -7,8 +7,8 @@ import pandas as pd
 
 from dotenv import load_dotenv
 from pymongo import UpdateOne
-from utils import get_mongo_client
-from logging_config import setup_logging
+from app.utils import get_mongo_client
+from app.logging_config import setup_logging
 
 setup_logging()
 
