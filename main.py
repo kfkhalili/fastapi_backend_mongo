@@ -2,7 +2,7 @@
 
 import os
 import fmpsdk
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Optional, List
@@ -127,3 +127,30 @@ def get_financials(
 
     # Return response
     return statement_docs
+
+@app.post("/user_input", status_code=status.HTTP_201_CREATED)
+async def push_user_input(
+    user_input: dict
+) -> dict:
+    """
+    Store user input
+    """
+    try:
+        mongo.push_user_input(user_input)
+        return {"message": "User input stored successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/user_input", response_model=dict)
+def get_user_input() -> dict:
+    """
+    Retrieve all user inputs stored in the database.
+    """
+    try:
+        doc = mongo.get_user_input()
+        if "_id" in doc:
+            doc["_id"] = str(doc["_id"])
+        return doc
+    
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
