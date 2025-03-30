@@ -32,5 +32,5 @@ poetry run python setup_mongo.py
 4. Run Backend API
 
 ```bash
-poetry run uvicorn main:app --reload
+poetry run uvicorn app.main:app --reload
 ```
