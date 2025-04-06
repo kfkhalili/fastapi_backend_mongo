@@ -66,7 +66,7 @@ def push_user_input(user_input: dict) -> str:
     """
     try:
         existing_doc = get_user_input()
-        if existing_doc is not None:
+        if existing_doc and '_id' in existing_doc:
             # Merge the new fields into the existing document
             user_input_collection.update_one(
                 {'_id': existing_doc['_id']},
